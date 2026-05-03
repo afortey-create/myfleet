@@ -467,8 +467,9 @@ with tab1:
             svcd = days_remaining(r["Next_Service_Due"])
             ws   = worst(rd, insd, svcd)
 
-            nickname  = s(r["Nickname"]) or f"{r['Year']} {r['Make']} {r['Model']}"
-            makemodel = f"{int(r['Year'])} {r['Make']} {r['Model']}"
+            year_str  = str(int(float(s(r["Year"])))) if s(r["Year"]) and str(s(r["Year"])).replace(".","").isdigit() else ""
+            nickname  = s(r["Nickname"]) or f"{year_str} {s(r['Make'])} {s(r['Model'])}".strip()
+            makemodel = f"{year_str} {s(r['Make'])} {s(r['Model'])}".strip()
             rego      = s(r["Rego"])
             img_url   = s(r["Image_URL"])
             onedrive  = s(r["OneDrive_Link"])
