@@ -465,7 +465,7 @@ with tab1:
             rd   = days_remaining(r["Rego_Expiry"])
             insd = days_remaining(r["Insurance_Expiry"])
             svcd = days_remaining(r["Next_Service_Due"])
-            ws   = worst(rd, insd, svcd)
+            vstatus = worst(rd, insd, svcd)
 
             year_str  = str(int(float(s(r["Year"])))) if s(r["Year"]) and str(s(r["Year"])).replace(".","").isdigit() else ""
             nickname  = s(r["Nickname"]) or f"{year_str} {s(r['Make'])} {s(r['Model'])}".strip()
@@ -476,11 +476,11 @@ with tab1:
             notes     = s(r["Notes"])
             odo       = s(r["Odometer"])
 
-            left_col = {"red":"#C0392B","amber":"#D4750A","green":"#86BC25","grey":"#D0D0CE"}[ws]
+            left_col = {"red":"#C0392B","amber":"#D4750A","green":"#86BC25","grey":"#D0D0CE"}[vstatus]
 
             # Image tag — use a reliable placeholder if no URL
             if img_url:
-                img_tag = f'<img src="{img_url}" class="vcard-img" onerror="this.outerHTML=\'<div class=vcard-img-ph>🚗</div>\'">'
+                img_tag = '<img src="' + img_url + '" class="vcard-img" style="max-width:90px;max-height:60px">'
             else:
                 img_tag = '<div class="vcard-img-ph">🚗</div>'
 
@@ -501,7 +501,7 @@ with tab1:
       <div class="vcard-rego">{rego}</div>
       {odo_tag}
     </div>
-    <div style="flex-shrink:0">{badge_html(ws)}</div>
+    <div style="flex-shrink:0">{badge_html(vstatus)}</div>
   </div>
 
   <div class="mobile-summary">
