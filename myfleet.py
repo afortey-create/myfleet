@@ -245,7 +245,6 @@ label[data-testid="stWidgetLabel"] { color: var(--dark) !important; font-weight:
 }
 hr { border-color: var(--light) !important; }
 
-/* Expander overrides — hide default, we use our own cards */
 .streamlit-expanderHeader { display: none !important; }
 .streamlit-expanderContent {
     border: none !important;
@@ -454,8 +453,6 @@ with tab1:
 
             card_html = f"""
 <div class="vcard" style="border-left: 4px solid {left_col}">
-
-  <!-- Header -->
   <div class="vcard-header">
     {img_tag}
     <div style="flex:1;min-width:0">
@@ -466,25 +463,18 @@ with tab1:
     </div>
     <div style="flex-shrink:0">{badge_html(ws)}</div>
   </div>
-
-  <!-- Info grid -->
   <div class="info-grid">
-
-    <!-- Col 1: Rego + Roadside -->
     <div class="info-section">
-      <div class="sec-title">📋 Registration</div>
+      <div class="sec-title">Registration</div>
       {row("Expires", fmt(r["Rego_Expiry"]), "f-mono")}
       <div class="f-label">Remaining</div>{dpill_html(rd)}
-
       <div style="margin-top:0.9rem"></div>
-      <div class="sec-title">🛟 Roadside Assist</div>
+      <div class="sec-title">Roadside Assist</div>
       {row("Provider", s(r["Roadside_Provider"]))}
       {row("Phone", s(r["Roadside_Phone"]), "f-phone")}
     </div>
-
-    <!-- Col 2: Insurance -->
     <div class="info-section">
-      <div class="sec-title">🛡️ Insurance</div>
+      <div class="sec-title">Insurance</div>
       {row("Provider", s(r["Insurance_Provider"]))}
       {row("Phone", s(r["Insurance_Phone"]), "f-phone")}
       {row("Expires", fmt(r["Insurance_Expiry"]), "f-mono")}
@@ -492,10 +482,8 @@ with tab1:
       {row("Excess", "$" + s(r["Insurance_Excess"]) if s(r["Insurance_Excess"]) else "—")}
       {row("Named Drivers", s(r["Named_Drivers"]))}
     </div>
-
-    <!-- Col 3: Service -->
     <div class="info-section">
-      <div class="sec-title">🔧 Service</div>
+      <div class="sec-title">Service</div>
       {row("Last Service", fmt(r["Last_Service_Date"]), "f-mono")}
       {row("Performed By", s(r["Last_Service_By"]))}
       {row("Phone", s(r["Last_Service_Phone"]), "f-phone")}
@@ -504,7 +492,6 @@ with tab1:
       {row("Preferred Centre", s(r["Preferred_Centre"]))}
       {row("Centre Phone", s(r["Preferred_Centre_Phone"]), "f-phone")}
     </div>
-
   </div>
 
   {notes_html}
