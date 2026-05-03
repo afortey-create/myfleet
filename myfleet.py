@@ -347,16 +347,16 @@ def worst(rd, ins, svc):
 
 
 def dpill_html(days, label=""):
-    if days is None: return '<span class="dpill dpill-grey">—</span>'
+    if days is None: return '<span class="dpill dpill-grey">&mdash;</span>'
     c = colour(days)
-    t = f"{days}d" if days >= 0 else f"OVERDUE {abs(days)}d"
-    return f'<span class="dpill dpill-{c}">{t}</span>'
+    t = str(days) + "d" if days >= 0 else "OVERDUE " + str(abs(days)) + "d"
+    return '<span class="dpill dpill-' + c + '">' + t + '</span>'
 
 
 def badge_html(ws):
-    icons  = {"red":"⚠","amber":"●","green":"✓","grey":"○"}
+    icons  = {"red":"!","amber":"&bull;","green":"&check;","grey":"&circ;"}
     labels = {"red":"URGENT","amber":"DUE SOON","green":"OK","grey":"UNKNOWN"}
-    return f'<span class="badge badge-{ws}">{icons[ws]} {labels[ws]}</span>'
+    return '<span class="badge badge-' + ws + '">' + icons[ws] + ' ' + labels[ws] + '</span>'
 
 
 def next_id(df):
@@ -368,7 +368,7 @@ def s(val):
 
 
 def fmt(dt):
-    return dt.strftime(DATE_FMT) if pd.notna(dt) else "—"
+    return dt.strftime(DATE_FMT) if pd.notna(dt) else "&mdash;"
 
 
 def dval(row, col):
@@ -377,7 +377,8 @@ def dval(row, col):
 
 
 def row(label, value, cls="f-val"):
-    return f'<div class="f-label">{label}</div><div class="{cls}">{value or "—"}</div>'
+    v = value if value else "&mdash;"
+    return '<div class="f-label">' + label + '</div><div class="' + cls + '">' + v + '</div>'
 
 
 # ──────────────────────────────────────────────
@@ -482,12 +483,12 @@ with tab1:
             if img_url:
                 img_tag = '<img src="' + img_url + '" class="vcard-img" style="max-width:90px;max-height:60px">'
             else:
-                img_tag = '<div class="vcard-img-ph">🚗</div>'
+                img_tag = '<div class="vcard-img-ph">&#128663;</div>'
 
-            odo_tag = f'<div><span class="odo">🔢 {int(float(odo)):,} km</span></div>' if odo else ""
+            odo_tag = '<div><span class="odo">km: ' + f"{int(float(odo)):,}" + '</span></div>' if odo else ""
 
-            notes_html = f'<div class="notes-bar">📝 {notes}</div>' if notes else ""
-            link_html  = f'<div><a href="{onedrive}" target="_blank" class="od-link">📁 Open OneDrive Documents</a></div>' if onedrive and onedrive.startswith("http") else ""
+            notes_html = '<div class="notes-bar">&#128221; ' + notes + '</div>' if notes else ""
+            link_html  = '<div><a href="' + onedrive + '" target="_blank" class="od-link">&#128193; Open OneDrive Documents</a></div>' if onedrive and onedrive.startswith("http") else ""
 
             uid = s(r["Vehicle_ID"])
             card_html = f"""
@@ -758,4 +759,4 @@ with tab2:
             st.markdown('<div class="section-h" style="margin-top:1.5rem">Retired Vehicles</div>', unsafe_allow_html=True)
             for _, r in retired.iterrows():
                 nick = s(r["Nickname"]) or f"{r['Make']} {r['Model']}"
-                st.markdown(f'<span style="color:#53565A;font-size:0.82rem">▸ {nick} &nbsp;·&nbsp; {r["Rego"]}</span>', unsafe_allow_html=True)
+                st.markdown('<span style="color:#53565A;font-size:0.82rem">&#9658; ' + nick + ' &nbsp;&middot;&nbsp; ' + str(r["Rego"]) + '</span>', unsafe_allow_html=True)
