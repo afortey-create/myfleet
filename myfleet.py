@@ -156,14 +156,11 @@ html, body, [class*="css"] {
 /* Odo chip */
 .odo { display: inline-block; background: var(--pale); border: 1px solid var(--border); border-radius: 3px; padding: 0.08rem 0.4rem; font-size: 0.68rem; color: var(--mid); font-weight: 600; white-space: nowrap; margin-top: 0.15rem; }
 
-/* Info grid — 3 sections side by side on desktop, stacked on mobile */
+/* Info grid — 3 cols desktop, hidden on mobile (replaced by summary strip) */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 0;
-}
-@media (max-width: 600px) {
-    .info-grid { grid-template-columns: 1fr; }
 }
 .info-section {
     padding: 0.85rem 1rem;
@@ -171,8 +168,48 @@ html, body, [class*="css"] {
     border-bottom: 1px solid var(--light);
 }
 .info-section:last-child { border-right: none; }
+
+/* Mobile summary strip — 3 status pills in a row */
+.mobile-summary {
+    display: none;
+    padding: 0.6rem 0.9rem;
+    gap: 0.5rem;
+    border-top: 1px solid var(--light);
+    flex-wrap: wrap;
+}
+.ms-item { display: flex; flex-direction: column; flex: 1; min-width: 80px; }
+.ms-label { font-size: 0.56rem; color: var(--mid); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 0.2rem; }
+
+/* CSS-only expand toggle */
+.detail-toggle { display: none; }
+.detail-label {
+    display: none;
+    width: 100%;
+    text-align: center;
+    padding: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--green);
+    border-top: 1px solid var(--light);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    background: var(--pale);
+    user-select: none;
+}
+.detail-label:hover { background: var(--palegreen); }
+.detail-content { display: block; }
+
 @media (max-width: 600px) {
+    .info-grid { grid-template-columns: 1fr; display: none; }
     .info-section { border-right: none; }
+    .mobile-summary { display: flex; }
+    .detail-label { display: block; }
+    .detail-toggle:checked ~ .detail-label { color: var(--mid); }
+    .detail-toggle:checked ~ .detail-label::before { content: "▲ Hide detail"; }
+    .detail-label::before { content: "▼ Show full detail"; }
+    .detail-toggle:checked ~ .detail-content .info-grid { display: grid; grid-template-columns: 1fr; }
+    .detail-content { display: none; }
+    .detail-toggle:checked ~ .detail-content { display: block; }
 }
 
 .sec-title {
@@ -451,8 +488,10 @@ with tab1:
             notes_html = f'<div class="notes-bar">📝 {notes}</div>' if notes else ""
             link_html  = f'<div><a href="{onedrive}" target="_blank" class="od-link">📁 Open OneDrive Documents</a></div>' if onedrive and onedrive.startswith("http") else ""
 
+            uid = s(r["Vehicle_ID"])
             card_html = f"""
 <div class="vcard" style="border-left: 4px solid {left_col}">
+
   <div class="vcard-header">
     {img_tag}
     <div style="flex:1;min-width:0">
@@ -463,39 +502,61 @@ with tab1:
     </div>
     <div style="flex-shrink:0">{badge_html(ws)}</div>
   </div>
-  <div class="info-grid">
-    <div class="info-section">
-      <div class="sec-title">Registration</div>
-      {row("Expires", fmt(r["Rego_Expiry"]), "f-mono")}
-      <div class="f-label">Remaining</div>{dpill_html(rd)}
-      <div style="margin-top:0.9rem"></div>
-      <div class="sec-title">Roadside Assist</div>
-      {row("Provider", s(r["Roadside_Provider"]))}
-      {row("Phone", s(r["Roadside_Phone"]), "f-phone")}
+
+  <div class="mobile-summary">
+    <div class="ms-item">
+      <div class="ms-label">Rego</div>
+      {dpill_html(rd)}
+      <div style="font-size:0.72rem;color:var(--mid);margin-top:0.15rem">{fmt(r["Rego_Expiry"])}</div>
     </div>
-    <div class="info-section">
-      <div class="sec-title">Insurance</div>
-      {row("Provider", s(r["Insurance_Provider"]))}
-      {row("Phone", s(r["Insurance_Phone"]), "f-phone")}
-      {row("Expires", fmt(r["Insurance_Expiry"]), "f-mono")}
-      <div class="f-label">Remaining</div>{dpill_html(insd)}
-      {row("Excess", "$" + s(r["Insurance_Excess"]) if s(r["Insurance_Excess"]) else "—")}
-      {row("Named Drivers", s(r["Named_Drivers"]))}
+    <div class="ms-item">
+      <div class="ms-label">Insurance</div>
+      {dpill_html(insd)}
+      <div style="font-size:0.72rem;color:var(--mid);margin-top:0.15rem">{fmt(r["Insurance_Expiry"])}</div>
     </div>
-    <div class="info-section">
-      <div class="sec-title">Service</div>
-      {row("Last Service", fmt(r["Last_Service_Date"]), "f-mono")}
-      {row("Performed By", s(r["Last_Service_By"]))}
-      {row("Phone", s(r["Last_Service_Phone"]), "f-phone")}
-      {row("Next Due", fmt(r["Next_Service_Due"]), "f-mono")}
-      <div class="f-label">Remaining</div>{dpill_html(svcd)}
-      {row("Preferred Centre", s(r["Preferred_Centre"]))}
-      {row("Centre Phone", s(r["Preferred_Centre_Phone"]), "f-phone")}
+    <div class="ms-item">
+      <div class="ms-label">Service</div>
+      {dpill_html(svcd)}
+      <div style="font-size:0.72rem;color:var(--mid);margin-top:0.15rem">{fmt(r["Next_Service_Due"])}</div>
     </div>
   </div>
 
-  {notes_html}
-  {link_html}
+  <input type="checkbox" class="detail-toggle" id="tog_{uid}">
+  <label class="detail-label" for="tog_{uid}"></label>
+  <div class="detail-content">
+    <div class="info-grid">
+      <div class="info-section">
+        <div class="sec-title">Registration</div>
+        {row("Expires", fmt(r["Rego_Expiry"]), "f-mono")}
+        <div class="f-label">Remaining</div>{dpill_html(rd)}
+        <div style="margin-top:0.9rem"></div>
+        <div class="sec-title">Roadside Assist</div>
+        {row("Provider", s(r["Roadside_Provider"]))}
+        {row("Phone", s(r["Roadside_Phone"]), "f-phone")}
+      </div>
+      <div class="info-section">
+        <div class="sec-title">Insurance</div>
+        {row("Provider", s(r["Insurance_Provider"]))}
+        {row("Phone", s(r["Insurance_Phone"]), "f-phone")}
+        {row("Expires", fmt(r["Insurance_Expiry"]), "f-mono")}
+        <div class="f-label">Remaining</div>{dpill_html(insd)}
+        {row("Excess", "$" + s(r["Insurance_Excess"]) if s(r["Insurance_Excess"]) else "—")}
+        {row("Named Drivers", s(r["Named_Drivers"]))}
+      </div>
+      <div class="info-section">
+        <div class="sec-title">Service</div>
+        {row("Last Service", fmt(r["Last_Service_Date"]), "f-mono")}
+        {row("Performed By", s(r["Last_Service_By"]))}
+        {row("Phone", s(r["Last_Service_Phone"]), "f-phone")}
+        {row("Next Due", fmt(r["Next_Service_Due"]), "f-mono")}
+        <div class="f-label">Remaining</div>{dpill_html(svcd)}
+        {row("Preferred Centre", s(r["Preferred_Centre"]))}
+        {row("Centre Phone", s(r["Preferred_Centre_Phone"]), "f-phone")}
+      </div>
+    </div>
+    {notes_html}
+    {link_html}
+  </div>
 
 </div>
 """
