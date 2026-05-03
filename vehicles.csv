@@ -1,0 +1,4 @@
+Vehicle_ID,Make,Model,Year,Rego,Rego_Expiry,Insurance_Provider,Insurance_Expiry,Last_Service_Date,Next_Service_Due,OneDrive_Link,Status
+1,Toyota,Hilux N80,2022,ABC123,15/08/2025,RACV,30/09/2025,10/01/2025,10/07/2025,https://onedrive.live.com/example-hilux,Active
+2,Ford,Ranger,2017,XYZ789,03/06/2025,Budget Direct,03/06/2025,22/11/2024,22/05/2025,https://onedrive.live.com/example-ranger,Active
+3,Toyota,Camry,2019,DEF456,20/11/2025,AAMI,20/11/2025,05/03/2025,05/09/2025,https://onedrive.live.com/example-camry,Active
